@@ -1,0 +1,30 @@
+import os
+
+# Load the configuration file
+configfile: "config.yaml"
+
+uploaded_csv = config["uploaded_csv"]
+param = config["param"]
+
+rule all:
+    input:
+        "results/final_output.csv"
+
+rule process:
+    input:
+        uploaded_csv=uploaded_csv
+    output:
+        "results/final_output.csv"
+
+    conda:
+        "workflow/envs/R_env.yaml"
+        
+    params:
+        param=param
+
+    script:
+        "workflow/scripts/filter.R"
+
+
+
+    
