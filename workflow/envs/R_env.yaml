@@ -1,0 +1,7 @@
+name: r_environment
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - r-base
+  - r-dplyr
