@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centered Tables with Search and Export Options</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center; /* Center align content horizontally */
+            align-items: center; /* Center align content vertically */
+            height: 100vh; /* Full viewport height */
+            margin: 0;
+        }
+        .table-container {
+            display: flex;
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent tables from wrapping */
+            margin-bottom: 20px;
+        }
+        .table-wrapper {
+            width: 300px; /* Set a fixed width for each table wrapper */
+            margin-right: 10px; /* Space between tables */
+        }
+        .table-wrapper table {
+            width: 100%; /* Make table fill the wrapper */
+            border-collapse: collapse;
+            text-align: center; /* Center align table content */
+        }
+        .table-wrapper th, .table-wrapper td {
+            border: 1px solid #dddddd;
+            padding: 8px;
+        }
+        .table-wrapper th {
+            background-color: #f2f2f2;
+        }
+        .table-title {
+            text-align: center; /* Center align table title */
+            margin-bottom: 10px;
+        }
+        .table-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .search-input {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .export-button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .export-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="table-container">
+        <div class="table-wrapper">
+            <div class="table-title">Table 1</div>
+            <div class="table-actions">
+                <input type="text" class="search-input" placeholder="Search...">
+                <button class="export-button">Export</button>
+            </div>
+            <div class="slider">
+                <table>
+                    <thead>
+                        <tr>
+                            <!-- Generate table headers for 100 columns -->
+                            <th>Column 1</th>
+                            <th>Column 2</th>
+                            <!-- Repeat as needed -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Generate 100 rows with data -->
+                        <!-- Example row -->
+                        <tr>
+                            <td>Data 1</td>
+                            <td>Data 2</td>
+                            <!-- Repeat as needed -->
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Repeat for Table 2 -->
+        <div class="table-wrapper">
+            <div class="table-title">Table 2</div>
+            <div class="table-actions">
+                <input type="text" class="search-input" placeholder="Search...">
+                <button class="export-button">Export</button>
+            </div>
+            <div class="slider">
+                <table>
+                    <thead>
+                        <tr>
+                            <!-- Generate table headers for 100 columns -->
+                            <th>Column A</th>
+                            <th>Column B</th>
+                            <!-- Repeat as needed -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Generate 100 rows with data -->
+                        <!-- Example row -->
+                        <tr>
+                            <td>Data A</td>
+                            <td>Data B</td>
+                            <!-- Repeat as needed -->
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add more table wrappers as needed -->
+
+    </div>
+
+    <script>
+        // Function to handle export button click
+        function exportTable() {
+            alert('Exporting table...');
+            // Replace with actual export logic if needed
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Attach export functionality to all export buttons
+            var exportButtons = document.querySelectorAll('.export-button');
+            exportButtons.forEach(function(button) {
+                button.addEventListener('click', exportTable);
+            });
+
+            // Example: Add search functionality
+            var searchInputs = document.querySelectorAll('.search-input');
+            searchInputs.forEach(function(input) {
+                input.addEventListener('input', function(event) {
+                    var searchText = event.target.value.toLowerCase();
+                    var table = event.target.closest('.table-wrapper').querySelector('table');
+                    var rows = table.getElementsByTagName('tr');
+
+                    Array.from(rows).forEach(function(row) {
+                        var cells = row.getElementsByTagName('td');
+                        var found = false;
+                        Array.from(cells).forEach(function(cell) {
+                            var cellText = cell.textContent.toLowerCase();
+                            if (cellText.indexOf(searchText) > -1) {
+                                found = true;
+                            }
+                        });
+                        if (found) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

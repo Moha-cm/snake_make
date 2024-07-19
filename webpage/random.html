@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table without Flask</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        .pagination {
+            margin-top: 10px;
+        }
+        .pagination a {
+            display: inline-block;
+            padding: 5px 10px;
+            margin-right: 5px;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            text-decoration: none;
+            color: #333;
+        }
+        .pagination a.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Table without Flask</h1>
+
+    <!-- Table with static data -->
+    <table id="myTable">
+        <thead>
+            <tr>
+                <th>Column 1</th>
+                <th>Column 2</th>
+                <!-- Add more headers as needed -->
+            </tr>
+        </thead>
+        <tbody>
+            <!-- This will be dynamically populated -->
+        </tbody>
+    </table>
+
+    <!-- Pagination controls -->
+    <div class="pagination" id="pagination">
+        <!-- This will be dynamically populated -->
+    </div>
+
+    <script>
+        // Mock data (replace with actual data source or API call)
+        var data = [];
+        for (var i = 1; i <= 50; i++) {
+            data.push({
+                column1: 'Value ' + i,
+                column2: Math.random() * 100  // Random value
+            });
+        }
+
+        // Function to render table rows
+        function renderTable(page, pageSize) {
+            var tableBody = document.querySelector('#myTable tbody');
+            tableBody.innerHTML = '';
+
+            var start = (page - 1) * pageSize;
+            var end = start + pageSize;
+            var paginatedData = data.slice(start, end);
+
+            paginatedData.forEach(function(row) {
+                var tr = document.createElement('tr');
+                tr.innerHTML = '<td>' + row.column1 + '</td><td>' + row.column2.toFixed(2) + '</td>';
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // Function to render pagination controls
+        function renderPagination(currentPage, totalPages) {
+            var paginationElement = document.querySelector('#pagination');
+            paginationElement.innerHTML = '';
+
+            if (currentPage > 1) {
+                paginationElement.innerHTML += '<a href="#" onclick="changePage(' + (currentPage - 1) + ')">Previous</a>';
+            }
+
+            for (var i = 1; i <= totalPages; i++) {
+                if (i === currentPage) {
+                    paginationElement.innerHTML += '<a href="#" class="active">' + i + '</a>';
+                } else {
+                    paginationElement.innerHTML += '<a href="#" onclick="changePage(' + i + ')">' + i + '</a>';
+                }
+            }
+
+            if (currentPage < totalPages) {
+                paginationElement.innerHTML += '<a href="#" onclick="changePage(' + (currentPage + 1) + ')">Next</a>';
+            }
+        }
+
+        // Initial render
+        var currentPage = 1;
+        var pageSize = 10;
+        renderTable(currentPage, pageSize);
+        renderPagination(currentPage, Math.ceil(data.length / pageSize));
+
+        // Function to change page
+        function changePage(page) {
+            currentPage = page;
+            renderTable(currentPage, pageSize);
+            renderPagination(currentPage, Math.ceil(data.length / pageSize));
+        }
+    </script>
+
+</body>
+</html>
