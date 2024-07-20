@@ -99,11 +99,11 @@
     <div class="content">
         <div class="plot-content">
             {% if files_uploaded %}
-            <h1>Scatter Plot</h1>
-            <form method="POST" action="{{ url_for('scatter_plot') }}">
+            <h1>Box Plot</h1>
+            <form method="POST" action="{{ url_for('box_plot') }}">
                 <label for="plot-x-axis">X-Axis:</label>
                 <select id="plot-x-axis" name="plot_x_axis">
-                    {% for option in exp_option %}
+                    {% for option in col_option %}
                     <option value="{{ option }}">{{ option }}</option>
                     {% endfor %}
                 </select>
@@ -146,10 +146,10 @@
             </center>
             {% else %}
             <h1>Scatter Plot</h1>
-            <form method="POST" action="{{ url_for('scatter_plot') }}">
+            <form method="POST" action="{{ url_for('box_plot') }}">
                 <label for="plot-x-axis">X-Axis:</label>
                 <select id="plot-x-axis" name="plot_x_axis">
-                    {% for option in exp_option %}
+                    {% for option in col_option %}
                     <option value="{{ option }}">{{ option }}</option>
                     {% endfor %}
                 </select>

@@ -161,6 +161,89 @@ def scatter_plot():
 
 
 
+@app.route('/box_plot', methods=["GET", "POST"])
+def box_plot():
+    global uploaded_files
+
+    def get_recent_files():
+        if not uploaded_files:
+            return None, None
+        file_info = uploaded_files[-1]
+        raw_counts_path = os.path.join(app.config['UPLOAD_FOLDER'], file_info[0])
+        meta_data_path = os.path.join(app.config['UPLOAD_FOLDER'], file_info[1])
+        return raw_counts_path, meta_data_path
+
+    def read_data_files(raw_counts_path, meta_data_path):
+        raw_counts_df = pd.read_csv(raw_counts_path)
+        meta_data_df = pd.read_csv(meta_data_path)
+        common_columns = [col for col in meta_data_df.columns if col in raw_counts_df.columns]
+        return raw_counts_df, meta_data_df, common_columns
+
+    raw_counts_path, meta_data_path = get_recent_files()
+    if not raw_counts_path or not meta_data_path:
+        return redirect(url_for('upload_form'))
+
+    raw_counts_df, meta_data_df, common_columns = read_data_files(raw_counts_path, meta_data_path)
+    colnames_meta = list(meta_data_df.select_dtypes(exclude='number').columns)
+    raw_counts_column = list(raw_counts_df.select_dtypes(exclude='number').columns)
+
+    if request.method == "POST":
+        plot_x_axis = request.form.get('plot_x_axis')
+        color_options = request.form.get('color_options')
+        gene_name = request.form.get('gene')
+
+        if not plot_x_axis or not color_options or not gene_name:
+            return "All form fields are required.", 400
+
+        gene_ids = pd.read_csv("ensembl_gene_ids.csv")
+        filter_gene = gene_ids[gene_ids["Gene_name"] == gene_name]
+
+        if filter_gene.empty:
+            return "Gene not found.", 400
+        
+        filter_ensemble_version_id = filter_gene["ensembl_gene_id_version"].iloc[0]
+        
+        subset_columns = [plot_x_axis,filter_ensemble_version_id, color_options]
+
+        dataset = pd.merge(meta_data_df, raw_counts_df, left_on=common_columns, right_on=common_columns)
+        filter_dataset = dataset[subset_columns]
+        filter_dataset.rename(columns={filter_ensemble_version_id: filter_gene["Gene_name"].iloc[0]}, inplace=True)
+        filtered_gene = filter_gene["Gene_name"].iloc[0]
+        fig = px.box(
+            filter_dataset, 
+            x=plot_x_axis, 
+            y=filter_gene["Gene_name"].iloc[0],
+            color=color_options )
+        
+        fig.update_layout(
+            plot_bgcolor='white',
+            title={
+                'text': f"<b>{filtered_gene} Expression by {color_options.replace("_"," ").capitalize()}</b>",  # Make title bold
+                'x': 0.5,  # Center the title
+                'xanchor': 'center',
+                'yanchor': 'top',
+                'font': {
+                    'color': 'black'  # Change the font color to black
+                }
+            },
+            xaxis={
+                'showticklabels': False,  # Hide x-axis labels
+                'showline': True,  # Show x-axis line
+                'linecolor': 'black'  # Set x-axis border color to black
+            },
+            yaxis={
+                'showticklabels': True,  # Show y-axis labels
+                'showline': True,  # Show y-axis line
+                'linecolor': 'black'  # Set y-axis border color to black
+            })
+       
+        graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+        return render_template('box_plot.html', raw_counts=filter_dataset.to_dict(orient='records'), col_option=colnames_meta, exp_option=raw_counts_column, files_uploaded=True, graphJSON=graphJSON)
+
+    return render_template('box_plot.html', col_option=colnames_meta, files_uploaded=False)
+
+
 
 
 
